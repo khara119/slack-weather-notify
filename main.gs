@@ -9,22 +9,29 @@ function notify(numberOfHour) {
   
   numberOfHour = numberOfHour ? numberOfHour : 12;
   
+  // 天気情報取得
   weather_info = getWeather();
   weather_hourly = weather_info.hourly;
   
   var maxPrecipProbability = 0;
   var maxPrecipProbabilityTime = [];
+  
+  // 必要数分取得する
   for (var i=0; i<numberOfHour; i++) {
     var data = weather_hourly.data[i];
     var time = Moment.moment.unix(data.time).format('YYYY-MM-DD HH:mm');
+    
+    // 降水確率を0-1間で取得しているので、10%刻みになるように整形
     var precipProbability = Math.round(data.precipProbability * 10) * 10;
     Logger.log(time + ': ' + JSON.stringify(data));
-    
+
+    // 最高降水確率を上回ればデータ更新
     if (precipProbability > maxPrecipProbability) {
       maxPrecipProbability = precipProbability;
       maxPrecipProbabilityTime = [];
       maxPrecipProbabilityTime.push(time.slice(-5, -3) + '時');
     } else if (precipProbability == maxPrecipProbability) {
+      // 最高降水確率の時間を記録
       maxPrecipProbabilityTime.push(time.slice(-5, -3) + '時');
     }
   }
@@ -32,7 +39,7 @@ function notify(numberOfHour) {
   const start_time = Moment.moment.unix(weather_hourly.data[0].time).format('MM月DD日 HH時');
   const end_time = Moment.moment.unix(weather_hourly.data[numberOfHour-1].time).format('MM月DD日 HH時');
   var text = start_time + 'から' + end_time +'までの最高降水確率は ' + maxPrecipProbability + '% です。\n';
-  if (maxPrecipProbabilityTime.length > 0) {
+  if (maxPrecipProbability > 0) {
     text += JSON.stringify(maxPrecipProbabilityTime) + 'に最高降水確率になります。';
   }
   
