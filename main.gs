@@ -38,8 +38,16 @@ function notify(numberOfHour) {
   
   const start_time = Moment.moment.unix(weather_hourly.data[0].time).format('MM月DD日 HH時');
   const end_time = Moment.moment.unix(weather_hourly.data[numberOfHour-1].time).format('MM月DD日 HH時');
-  var text = start_time + 'から' + end_time +'までの最高降水確率は ' + maxPrecipProbability + '% です。\n';
+
+  var text = start_time + 'から' + end_time +'まで天気です。\n';
+  text += '最高降水確率：' + maxPrecipProbability + '% \n';
+
   if (maxPrecipProbability > 0) {
+    // 50%以上のときは通知付きで送信
+    if (maxPrecipProbability >= 50) {
+      text = '<!channel>\n' + text;
+    }
+
     text += JSON.stringify(maxPrecipProbabilityTime) + 'に最高降水確率になります。';
   }
   
